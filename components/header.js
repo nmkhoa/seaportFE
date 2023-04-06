@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
-const Index = ({ page }) => {
+const Index = ({ page, isDetail }) => {
   const [haveMetamask, sethaveMetamask] = useState(true);
   const router = useRouter();
 
@@ -46,6 +46,7 @@ const Index = ({ page }) => {
       const accounts = await ethereum.request({
         method: "eth_requestAccounts",
       });
+      localStorage.setItem("user_address", accounts[0]);
 
       setclient({
         isConnected: true,
@@ -62,29 +63,51 @@ const Index = ({ page }) => {
 
   return (
     <nav className="fren-nav d-flex">
-      <div style={{ backgroundColor: page === "Marketplace" ? "transparent" : "red", borderRadius: 4 }}>
-        <button
-          onClick={() => router.push("/")}
-          type="button"
-          data-te-ripple-init
-          data-te-ripple-color="light"
-          className="inline-block rounded px-6 pt-2.5 pb-2 text-xs font-medium uppercase leading-normal text-primary transition duration-150 ease-in-out hover:bg-neutral-500 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-0 active:text-primary-700"
-        >
-          My NFT
-        </button>
-      </div>
-      <div style={{ backgroundColor: page === "Home" ? "transparent" : "red", borderRadius: 4 }} className="ml-[20px]">
-        <button
-          onClick={() => router.push("/marketplace")}
-          type="button"
-          data-te-ripple-init
-          data-te-ripple-color="light"
-          className="inline-block rounded px-6 pt-2.5 pb-2 text-xs font-medium uppercase leading-normal text-primary transition duration-150 ease-in-out hover:bg-neutral-500 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-0 active:text-primary-700"
-        >
-          Marketplace
-        </button>
-      </div>
+      {!isDetail && (
+        <>
+          <div style={{ backgroundColor: page === "Marketplace" ? "transparent" : "red", borderRadius: 4 }}>
+            <button
+              onClick={() => router.push("/")}
+              type="button"
+              data-te-ripple-init
+              data-te-ripple-color="light"
+              className="inline-block rounded px-6 pt-2.5 pb-2 text-xs font-medium uppercase leading-normal text-primary transition duration-150 ease-in-out hover:bg-neutral-500 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-0 active:text-primary-700"
+            >
+              My NFT
+            </button>
+          </div>
+          <div
+            style={{ backgroundColor: page === "Home" ? "transparent" : "red", borderRadius: 4 }}
+            className="ml-[20px]"
+          >
+            <button
+              onClick={() => router.push("/marketplace")}
+              type="button"
+              data-te-ripple-init
+              data-te-ripple-color="light"
+              className="inline-block rounded px-6 pt-2.5 pb-2 text-xs font-medium uppercase leading-normal text-primary transition duration-150 ease-in-out hover:bg-neutral-500 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-0 active:text-primary-700"
+            >
+              Marketplace
+            </button>
+          </div>
+        </>
+      )}
 
+      {isDetail && (
+        <>
+          <div style={{ backgroundColor: page === "Marketplace" ? "transparent" : "red", borderRadius: 4 }}>
+            <button
+              onClick={() => router.push("/")}
+              type="button"
+              data-te-ripple-init
+              data-te-ripple-color="light"
+              className="inline-block rounded px-6 pt-2.5 pb-2 text-xs font-medium uppercase leading-normal text-primary transition duration-150 ease-in-out hover:bg-neutral-500 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-0 active:text-primary-700"
+            >
+              Back
+            </button>
+          </div>
+        </>
+      )}
       <div className="d-flex" style={{ marginLeft: "auto" }}>
         <div>
           <button className="btn connect-btn" onClick={() => connectWeb3()}>

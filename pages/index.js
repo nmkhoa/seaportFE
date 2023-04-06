@@ -13,7 +13,7 @@ import { ItemType } from "@opensea/seaport-js/lib/constants";
 
 const Index = () => {
   const [nftList, setNftList] = useState([]);
-
+  const router = useRouter();
   useEffect(() => {
     getListNFT();
   }, []);
@@ -36,6 +36,12 @@ const Index = () => {
       });
   };
   const createOrder = async (data) => {
+    console.log(data);
+    router.push({
+      pathname: "/detail",
+      query: { tokenId: JSON.stringify(parseInt(data?.token_id ?? 0)) },
+    });
+    return;
     const provider = new ethers.providers.Web3Provider(window.ethereum);
 
     const seaport = new Seaport(provider, {
