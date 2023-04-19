@@ -18,13 +18,16 @@ const Index = () => {
     getListNFT();
   }, []);
   const getListNFT = () => {
-    axios
-      .get("http://localhost:3333/api/v1/nft/list?address=0xf6541439A90E7e340E913A2D70Dc1Ee283D1E90A&limit=20")
-      .then(function (response) {
+    var data ={wallet_address :'0x3658A235f1c0529ffB37D082eb0C508c17FE12e8', signature:'0x3aCbFfcA89769dDa7d2974406febaACAbe443a0d'}
+    axios.post(`http://localhost:3333/api/v1/nft/list`, data, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then(function (response) {
         // handle success
         console.log(response?.data);
-        if (response?.data?.result && response?.data?.result.length > 0) {
-          setNftList(response?.data?.result);
+        if (response?.data && response?.data.length > 0) {
+          setNftList(response?.data);
         }
       })
       .catch(function (error) {
@@ -39,66 +42,70 @@ const Index = () => {
     console.log(data);
     router.push({
       pathname: "/detail",
-      query: { tokenId: JSON.stringify(parseInt(data?.token_id ?? 0)) },
+      query: { tokenId: JSON.stringify(parseInt(191)) },
     });
     return;
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    // const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-    const seaport = new Seaport(provider, {
-      overrides: {
-        contractAddress: process.env.NEXT_PUBLIC_MARKET_CONTRACT,
-      },
-    });
+    // const seaport = new Seaport(provider, {
+    //   overrides: {
+    //     contractAddress: process.env.NEXT_PUBLIC_MARKET_CONTRACT,
+    //   },
+    // });
 
-    const offerer = "0xf6541439A90E7e340E913A2D70Dc1Ee283D1E90A";
-    // const fulfiller = "0x70997970c51812dc3a010c7d01b50e0d17dc79c8";
+    // const offerer = "0x5bc97279854AD7D566717bC2de9479E67982A172";
+    // // const fulfiller = "0x70997970c51812dc3a010c7d01b50e0d17dc79c8";
 
-    const { executeAllActions } = await seaport.createOrder({
-      offer: [
-        {
-          itemType: ItemType.ERC721,
-          token: "0x3cdA5802ae0e3553192326f5d270771A14bf8D34",
-          identifier: "2",
-        },
-      ],
-      consideration: [
-        {
-          amount: ethers.utils.parseEther("10").toString(),
-          token: "0x13C0B86d8e78354cA94469D8Fa3939599AE4e221",
-        },
-      ],
-    });
+    // const { executeAllActions } = await seaport.createOrder({
+    //   offer: [
+    //     {
+    //       itemType: ItemType.ERC721,
+    //       token: process.env.NEXT_PUBLIC_NFT_CONTRACT,
+    //       identifier: '191',
+    //     },
+    //   ],
+    //   consideration: [
+    //     {
+    //       amount: ethers.utils.parseEther("90").toString(),
+    //       token: process.env.NEXT_PUBLIC_BUSD,
+    //     },
+    //   ],
+    // }, offerer);
 
-    const order = await executeAllActions();
+    // const order = await executeAllActions();
 
-    const xxx1 = await seaport.createOrder({
-      offer: [
-        {
-          itemType: ItemType.ERC721,
-          token: "0x3cdA5802ae0e3553192326f5d270771A14bf8D34",
-          identifier: "2",
-        },
-      ],
-      consideration: [
-        {
-          amount: ethers.utils.parseEther("1").toString(),
-          token: "0x13C0B86d8e78354cA94469D8Fa3939599AE4e221",
-        },
-      ],
-    });
+    // const xxx1 = await seaport.createOrder({
+    //   offer: [
+    //     {
+    //       itemType: ItemType.ERC721,
+    //       token: "0x3cdA5802ae0e3553192326f5d270771A14bf8D34",
+    //       identifier: "2",
+    //     },
+    //   ],
+    //   consideration: [
+    //     {
+    //       amount: ethers.utils.parseEther("1").toString(),
+    //       token: "0x13C0B86d8e78354cA94469D8Fa3939599AE4e221",
+    //     },
+    //   ],
+    // });
 
-    const order1 = await xxx1.executeAllActions();
-    console.log("??", order1);
-    // const signer = provider.getSigner();
+    // const order1 = await xxx1.executeAllActions();
+    // console.log("??", order);
+    //  const signer = provider.getSigner();
 
-    // const seaportContract = new ethers.Contract(process.env.NEXT_PUBLIC_MARKET_CONTRACT, SeaportAbi.abi, signer);
-    // const orderHash = await seaportContract.getOrderHash(order.parameters);
+    //  const seaportContract = new ethers.Contract(process.env.NEXT_PUBLIC_MARKET_CONTRACT, SeaportAbi.abi, signer);
+    //  const orderHash = await seaportContract.getOrderHash(order.parameters);
 
-    // var hashText = CryptoJS.AES.encrypt(JSON.stringify(order.parameters), process.env.NEXT_PUBLIC_HASH_KEY).toString();
+    //  var hashText = CryptoJS.AES.encrypt(JSON.stringify(order.parameters), process.env.NEXT_PUBLIC_HASH_KEY).toString();
+    //  console.log("?????", orderHash);
     // axios
-    //   .post("http://127.0.0.1:3333/api/v1/order/create", {
+    //   .post("http://127.0.0.1:3333/api/v1/market/order/create", {
     //     input_order: hashText,
     //     order_hash: orderHash,
+    //     wallet_address :'0x3658A235f1c0529ffB37D082eb0C508c17FE12e8',
+    //     signature:'0x3aCbFfcA89769dDa7d2974406febaACAbe443a0d',
+    //     order_signature: order.signature
     //   })
     //   .then(function (response) {
     //     console.log(response);
@@ -110,21 +117,28 @@ const Index = () => {
     // const receipt = await seaport.cancelOrders([order.parameters], order.parameters.offerer).transact();
     // console.log(JSON.stringify(receipt));
 
-    const { executeAllActions: executeAllFulfillActions } = await seaport.fulfillOrder({
-      order: order1,
-      accountAddress: offerer,
-    });
+    // const { actions } = await seaport.fulfillOrder({
+    //   order: order,
+    //   accountAddress: offerer,
+    // });
+    
+    // for(let action of actions) {
+    //   const approveGasLimit = { gasLimit: "215120"}
+    //   // const estimatedGas = await action.transactionMethods.estimateGas(approveGasLimit);
+    //   // var payableOverrides = { gasLimit: estimatedGas  };
+    //    await action.transactionMethods.transact(approveGasLimit);
+    // }
 
-    const transaction = await executeAllFulfillActions();
-    console.log(JSON.stringify(transaction));
 
-    const { executeAllActions: yyy } = await seaport.fulfillOrder({
-      order,
-      accountAddress: offerer,
-    });
+    // console.log(approvalAction)
 
-    const transaction1 = await yyy();
-    console.log(JSON.stringify(transaction1));
+    // const { executeAllActions: yyy } = await seaport.fulfillOrder({
+    //   order,
+    //   accountAddress: offerer,
+    // });
+
+    // const transaction1 = await yyy();
+    //  console.log(JSON.stringify(transaction));
   };
   return (
     <>
@@ -139,13 +153,7 @@ const Index = () => {
               className="flex flex-col justify-between mt-[8px] bg-slate-700 active:bg-slate-500 p-2 rounded-lg"
             >
               <div>Contract address:</div>
-              <div className="w-[30px]">
-                {e?.token_address.slice(0, 10)}...
-                {e?.token_address.slice(e?.token_address.length - 10, e?.token_address.length)}
-              </div>
-              <div>Token ID: {e?.token_id}</div>
-              <div>Type: {e?.contract_type}</div>
-              <div>Symbol: {e?.symbol}</div>
+              <div>Token ID: {e?.nft_id}</div>
               <div>Name: {e?.name}</div>
             </div>
           );
