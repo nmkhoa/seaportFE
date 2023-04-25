@@ -10,6 +10,7 @@ import { Seaport } from "@opensea/seaport-js";
 import SeaportAbi from "./Seaport.json";
 import axios from "axios";
 import { ItemType } from "@opensea/seaport-js/lib/constants";
+import { DateTime } from 'luxon'
 
 const Index = () => {
   const [nftList, setNftList] = useState([]);
@@ -18,8 +19,8 @@ const Index = () => {
     getListNFT();
   }, []);
   const getListNFT = () => {
-    var data ={wallet_address :'0x3658A235f1c0529ffB37D082eb0C508c17FE12e8', signature:'0x3aCbFfcA89769dDa7d2974406febaACAbe443a0d'}
-    axios.post(`http://localhost:3333/api/v1/nft/list`, data, {
+    var data ={wallet_address :'0x5bc97279854AD7D566717bC2de9479E67982A172', signature:'0xe8d59cef88f209420c939e10980ffe02ee85fa4f341121af88eca79edce3cf1f02aeec6551cf3a3fd433b7b1e14c3800aec6e5460569c9d5261edfb2f1453bdf1b'}
+    axios.post(`https://fxb-test.icetea-software.com/api/v1/nft/list`, data, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -39,40 +40,47 @@ const Index = () => {
       });
   };
   const createOrder = async (data) => {
-    console.log(data);
-    router.push({
-      pathname: "/detail",
-      query: { tokenId: JSON.stringify(parseInt(191)) },
-    });
-    return;
-    // const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-    // const seaport = new Seaport(provider, {
-    //   overrides: {
-    //     contractAddress: process.env.NEXT_PUBLIC_MARKET_CONTRACT,
-    //   },
+   //  console.log(data);
+    // router.push({
+    //   pathname: "/detail",
+    //   query: { tokenId: JSON.stringify(parseInt(191)) },
     // });
+    // return;
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-    // const offerer = "0x5bc97279854AD7D566717bC2de9479E67982A172";
-    // // const fulfiller = "0x70997970c51812dc3a010c7d01b50e0d17dc79c8";
+    const seaport = new Seaport(provider, {
+      overrides: {
+        contractAddress: process.env.NEXT_PUBLIC_MARKET_CONTRACT,
+      },
+    });
 
-    // const { executeAllActions } = await seaport.createOrder({
-    //   offer: [
-    //     {
-    //       itemType: ItemType.ERC721,
-    //       token: process.env.NEXT_PUBLIC_NFT_CONTRACT,
-    //       identifier: '191',
-    //     },
-    //   ],
-    //   consideration: [
-    //     {
-    //       amount: ethers.utils.parseEther("90").toString(),
-    //       token: process.env.NEXT_PUBLIC_BUSD,
-    //     },
-    //   ],
-    // }, offerer);
+    const startTime = Math.floor(DateTime.utc().toSeconds());
+    const endTime = "1703148402";
 
-    // const order = await executeAllActions();
+    const offerer = "0x5bc97279854AD7D566717bC2de9479E67982A172";
+    // const fulfiller = "0x70997970c51812dc3a010c7d01b50e0d17dc79c8";
+
+    const { executeAllActions } = await seaport.createOrder({
+      startTime,
+      endTime,
+      offer: [
+        {
+          itemType: ItemType.ERC721,
+          token: process.env.NEXT_PUBLIC_NFT_CONTRACT,
+          identifier: ''+ data?.nft_id,
+        },
+      ],
+      consideration: [
+        {
+          amount: ethers.utils.parseEther("100").toString(),
+          token: process.env.NEXT_PUBLIC_BUSD,
+        },
+      ],
+
+      fees: [{ recipient: '0x3aCbFfcA89769dDa7d2974406febaACAbe443a0d', basisPoints: 300 }],
+    }, offerer);
+
+    const order = await executeAllActions();
 
     // const xxx1 = await seaport.createOrder({
     //   offer: [
@@ -91,28 +99,28 @@ const Index = () => {
     // });
 
     // const order1 = await xxx1.executeAllActions();
-    // console.log("??", order);
-    //  const signer = provider.getSigner();
+     console.log("??", order);
+     const signer = provider.getSigner();
 
-    //  const seaportContract = new ethers.Contract(process.env.NEXT_PUBLIC_MARKET_CONTRACT, SeaportAbi.abi, signer);
-    //  const orderHash = await seaportContract.getOrderHash(order.parameters);
+     const seaportContract = new ethers.Contract(process.env.NEXT_PUBLIC_MARKET_CONTRACT, SeaportAbi.abi, signer);
+     const orderHash = await seaportContract.getOrderHash(order.parameters);
 
-    //  var hashText = CryptoJS.AES.encrypt(JSON.stringify(order.parameters), process.env.NEXT_PUBLIC_HASH_KEY).toString();
-    //  console.log("?????", orderHash);
-    // axios
-    //   .post("http://127.0.0.1:3333/api/v1/market/order/create", {
-    //     input_order: hashText,
-    //     order_hash: orderHash,
-    //     wallet_address :'0x3658A235f1c0529ffB37D082eb0C508c17FE12e8',
-    //     signature:'0x3aCbFfcA89769dDa7d2974406febaACAbe443a0d',
-    //     order_signature: order.signature
-    //   })
-    //   .then(function (response) {
-    //     console.log(response);
-    //   })
-    //   .catch(function (error) {
-    //     console.log(error);
-    //   });
+     var hashText = CryptoJS.AES.encrypt(JSON.stringify(order.parameters), process.env.NEXT_PUBLIC_HASH_KEY).toString();
+    // console.log("?????", orderHash);
+    axios
+      .post("http://localhost:3333/api/v1/market/order/create", {
+        input_order: hashText,
+        order_hash: orderHash,
+        wallet_address :'0x5bc97279854AD7D566717bC2de9479E67982A172',
+        signature:'0xe8d59cef88f209420c939e10980ffe02ee85fa4f341121af88eca79edce3cf1f02aeec6551cf3a3fd433b7b1e14c3800aec6e5460569c9d5261edfb2f1453bdf1b',
+        order_signature: order.signature
+      })
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
 
     // const receipt = await seaport.cancelOrders([order.parameters], order.parameters.offerer).transact();
     // console.log(JSON.stringify(receipt));
